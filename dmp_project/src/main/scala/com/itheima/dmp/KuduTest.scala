@@ -35,7 +35,7 @@ object KuduTest {
     /// TODO: 3.调用隐式转化方法 操作kudu表
     // TODO:  a.实现：SparkSession.createKuduTable(
     import com.itheima.dmp.utils.KuduUtils._
-    //spark.createKuduTable(tableName, schema, keys, isDelete = false)
+    spark.createKuduTable(tableName, schema, keys, isDelete = false)
 
     // TODO: b.实现：SparkSession.deleteKuduTable()
     //spark.deleteKuduTable(tableName)
@@ -45,7 +45,7 @@ object KuduTest {
       (10001, "zhangsan", 23), (10002, "lisi", 22), (10003, "wagnwu", 23),
       (10004, "xiaohong", 21), (10005, "tainqi", 235), (10006, "zhaoliu", 24)
     ).toDF("id", "name", "age")
-    //studentsDF.saveAsKuduTable(tableName)
+    studentsDF.saveAsKuduTable(tableName)
 
     //  TODO: d.实现：SparkSession.readKuduTable(tableName) 返回的数据是Option[DataFrame]  需要模式匹配获取数据
     spark.readKuduTable(tableName) match {

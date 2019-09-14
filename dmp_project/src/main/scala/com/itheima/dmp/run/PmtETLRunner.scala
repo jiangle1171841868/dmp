@@ -12,24 +12,27 @@ object PmtETLRunner {
   def main(args: Array[String]): Unit = {
 
     /// TODO: 1.构架sparkSession实例对象
-    val spark: SparkSession = SparkSessionUtils.spark
+    val spark: SparkSession = SparkSessionUtils.createSparkSession(PmtETLRunner.getClass)
 
     /// TODO: 2.读取json格式的数据
     val dataFrame: DataFrame = spark.read.json(AppConfigHelper.AD_DATA_PATH)
 
     /// TODO: 3.调用ETL处理方法
-    IPProcessor.processData(dataFrame)
+    val kuduDF: DataFrame = IPProcessor.processData(dataFrame)
 
     /// TODO: 4.保存到kudu表
     import com.itheima.dmp.utils.KuduUtils._
+
+    //a.创建表 表的名称 -> ods_adinfo_20190914
     val tableName: String = AppConfigHelper.AD_MAIN_TABLE_NAME
-    val schema: StructType = dataFrame.schema
+    val schema: StructType = kuduDF.schema
     val keys: Seq[String] = Seq("uuid")
-    //a.创建表
     spark.createKuduTable(tableName, schema, keys)
 
     //b.保存数据
-    dataFrame.saveAsKuduTable(tableName)
+    kuduDF.saveAsKuduTable(tableName)
+
+    //Thread.sleep(100000)
 
     /// TODO: 5.应用完成,关闭资源
     spark.stop()

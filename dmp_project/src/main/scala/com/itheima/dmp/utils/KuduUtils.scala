@@ -97,7 +97,7 @@ class KuduUtils extends Logging {
   }
 
   /**
-    * 保存数据到苦读表
+    * 保存数据到kudu表
     *
     * @param tableName
     */
@@ -108,8 +108,8 @@ class KuduUtils extends Logging {
     if (dataFrame == null) {
       logInfo("DataFRame为空,重新构造新的非空DataFrame来添加数据...")
     } else (
-      //b.插入数据
 
+      //b.插入数据
       dataFrame.write
         .mode(SaveMode.Append)
         // 设置Kudu Master地址
