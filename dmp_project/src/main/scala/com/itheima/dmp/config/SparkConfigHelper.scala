@@ -6,9 +6,6 @@ import java.util.Map
 import com.typesafe.config.{Config, ConfigFactory, ConfigValue}
 import org.apache.spark.sql.SparkSession
 
-
-
-
 /**
   * 隐式转换:将SparkSession.Builder转化为SparkConfigHelper  调用SparkConfigHelper的方法
   * 目的: 动态加载数据 配置信息改动 代码不用修改
@@ -39,7 +36,8 @@ class SparkConfigHelper(sparkBuild: SparkSession.Builder) {
         */
       val resourceName = entry.getValue.origin().resource()
 
-      if (resourceName.equals("spark.conf")) {
+      /// TODO:  注意: 系统属性是的来源是null 如果使用configResource调用equals()方法 就会空指针异常  所以使用字符串类调用方法 也可以configResource == "spark.conf"
+      if ("spark.conf".equals(resourceName)) {
 
         //d.获取参数 封装到spark中 直接获取的value是使用Config封装的 Config(value) 使用unwrapped()拆箱 获取value
         sparkBuild.config(entry.getKey, entry.getValue.unwrapped().toString)

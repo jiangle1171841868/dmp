@@ -21,10 +21,10 @@ object AppDMP {
       //b.构造者模式创建sparksession实例对象
       import com.itheima.dmp.config.SparkConfigHelper._
       val session = SparkSession.builder()
-        //加载spark配置信息
-        .config(sparkConf)
         //加载参数配置信息 隐式转换实现 配置文件的参数变化 不需要改变代码
         .loadSparkConf()
+        //加载spark配置信息
+        .config(sparkConf)
         .getOrCreate()
 
       //c.返回spark实例

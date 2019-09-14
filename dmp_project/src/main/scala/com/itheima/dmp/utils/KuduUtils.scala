@@ -151,10 +151,7 @@ class KuduUtils extends Logging {
       None
 
     }
-
-
   }
-
 }
 
 
