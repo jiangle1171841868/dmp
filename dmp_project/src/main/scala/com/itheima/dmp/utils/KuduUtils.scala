@@ -58,24 +58,25 @@ class KuduUtils extends Logging {
       } else {
         logInfo(s"表 $tableName 在kudu中已经存在,不允许删除....")
       }
+    } else {
+
+      //2.表不存在开始创建
+      //a.设置表的分区  默认按照主键进行hash分区
+      val options = new CreateTableOptions
+
+      //将scala中封装主键的集合seq 转化为java的集合 作为分区的主键
+      import scala.collection.JavaConverters._
+      options.addHashPartitions(keys.asJava, 3)
+
+      //b.设置副本数
+      options.setNumReplicas(3)
+
+      //c.创建表
+      context.createTable(tableName, schema, keys, options)
+
+      //d.打印日志
+      logInfo(s"kudu表 $tableName 创建成功.......")
     }
-
-    //2.表不存在开始创建
-    //a.设置表的分区  默认按照主键进行hash分区
-    val options = new CreateTableOptions
-
-    //将scala中封装主键的集合seq 转化为java的集合 作为分区的主键
-    import scala.collection.JavaConverters._
-    options.addHashPartitions(keys.asJava, 3)
-
-    //b.设置副本数
-    options.setNumReplicas(3)
-
-    //c.创建表
-    context.createTable(tableName, schema, keys, options)
-
-    //d.打印日志
-    logInfo(s"kudu表 $tableName 创建成功.......")
   }
 
   /**

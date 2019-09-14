@@ -11,7 +11,7 @@ import org.lionsoul.ip2region.{DataBlock, DbConfig, DbSearcher}
 object IPUtils {
 
   /**
-    * 每条数据调用方法 都需要创建DbSearcher和LookupService实例对象 -> 可以优化成各个分区共用一个实例
+    * 每条数据调用方法 都需要创建DbSearcher和LookupService实例对象 每个task里面会创建大量的额对象 -> 可以优化成各个分区共用一个实例
     * @param ip
     * @return
     */
