@@ -1,13 +1,11 @@
 package com.itheima.dmp.utils
 
 import ch.hsr.geohash.GeoHash
+import com.itheima.dmp.beans.IpRegion
 import com.itheima.dmp.config.AppConfigHelper
 import com.maxmind.geoip.{Location, LookupService}
 import org.lionsoul.ip2region.{DataBlock, DbConfig, DbSearcher}
 
-//封装ip解析后的省市、经纬度信息
-case class IpRegion(ip: String, longitude: Double, latitude: Double,
-                    province: String, city: String, geoHash: String)
 
 /// TODO: 解析ip工具类
 object IPUtils {
@@ -30,5 +28,14 @@ object IPUtils {
 
     /// TODO: 4.返回样例对象
     IpRegion(ip, longitude, latitude, province, city, geoHash)
+  }
+
+  /**
+    * 测试工具类
+    */
+  def main(args: Array[String]): Unit = {
+
+    val region: IpRegion = convertIp2Region("106.87.131.39")
+    println(region)
   }
 }
