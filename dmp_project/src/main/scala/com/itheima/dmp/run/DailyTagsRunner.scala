@@ -21,12 +21,15 @@ object DailyTagsRunner {
 
     // ODS表名
     val ODS_TABLE_NAME: String = AppConfigHelper.AD_MAIN_TABLE_NAME
+
     // Area的表名
     val AREA_TABLE_NAME: String = AppConfigHelper.BUSINESS_AREAS_TABLE_NAME
+
     //定义历史的标签数据表名
     val HISTORY_TAGS_TABLE_NAME: String = {
       AppConfigHelper.TAGS_TABLE_NAME_PREFIX + DateUtils.getYesterdayDate()
     }
+
     //定义当天的标签数据表名
     val TODAY_TAGS_TABLE = {
       AppConfigHelper.TAGS_TABLE_NAME_PREFIX + DateUtils.getTodayDate()
