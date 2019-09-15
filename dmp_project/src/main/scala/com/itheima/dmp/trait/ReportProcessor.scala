@@ -1,5 +1,6 @@
 package com.itheima.dmp.`trait`
 
+import org.apache.spark.internal.Logging
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 
 /**
@@ -8,7 +9,7 @@ import org.apache.spark.sql.{Column, DataFrame, SparkSession}
   *    - 数据处理的方法 -> 每个报表不相同 单独抽取出来 -> realProcessData
   *    - 数据存储的方法  -> 表名和keys不一样  -> 抽取出报名和keys 为抽象字段
   */
-trait ReportProcessor {
+trait ReportProcessor extends Logging {
 
   //表名
   val tableName: String

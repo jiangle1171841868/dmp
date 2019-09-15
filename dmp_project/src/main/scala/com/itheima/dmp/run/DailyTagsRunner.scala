@@ -1,0 +1,74 @@
+package com.itheima.dmp.run
+
+import com.itheima.dmp.config.AppConfigHelper
+import com.itheima.dmp.utils.{DateUtils, SparkSessionUtils}
+import org.apache.spark.sql.{DataFrame, SparkSession}
+
+/**
+  * 1. 创建SparkSession
+  * 2. 加载ods表的数据和area表的数据，并且根据GeoHash进行关联
+  *    - 2.1. 加载ods表的数据
+  *    - 2.2  加载area表的数据
+  *    - 2.3  ods表数据与area表数据关联
+  * 3. 获取当日用户标签
+  * 4. 将数据保存到kudu表
+  * 5. 关闭资源
+  */
+object DailyTagsRunner {
+
+  def main(args: Array[String]): Unit = {
+
+    // ODS表名
+    val ODS_TABLE_NAME: String = AppConfigHelper.AD_MAIN_TABLE_NAME
+    // Area的表名
+    val AREA_TABLE_NAME: String = AppConfigHelper.BUSINESS_AREAS_TABLE_NAME
+    //定义历史的标签数据表名
+    val HISTORY_TAGS_TABLE_NAME: String = {
+      AppConfigHelper.TAGS_TABLE_NAME_PREFIX + DateUtils.getYesterdayDate()
+    }
+    //定义当天的标签数据表名
+    val TODAY_TAGS_TABLE = {
+      AppConfigHelper.TAGS_TABLE_NAME_PREFIX + DateUtils.getTodayDate()
+    }
+
+    // 1. 构建sparksession实例对象
+    val spark: SparkSession = SparkSessionUtils.createSparkSession(this.getClass)
+
+    // 2. 读取kudu表的数据
+    import com.itheima.dmp.utils.KuduUtils._
+
+    // 2.1 加载ods表的数据
+    val optionOdsDF: Option[DataFrame] = spark.readKuduTable(ODS_TABLE_NAME)
+    val odsDF: DataFrame = optionOdsDF match {
+      case Some(odsDF) => odsDF
+      case None => println("ERROR: ODS表无数据,结束执行"); return
+    }
+
+    // 2.2  加载area表的数据
+    val optionAreaDF: Option[DataFrame] = spark.readKuduTable(HISTORY_TAGS_TABLE_NAME)
+    optionAreaDF match {
+
+      //历史表存在 进行关联
+      // 2.3 ods表数据与area表数据关联 左关联
+      case Some(areaDF) =>
+        odsDF.join(
+          areaDF, //关联的表
+          odsDF.col("geoHash").equalTo(areaDF.col("geo_hash")), //关联条件
+          "left" //关联方式
+        )
+      //历史表不存在,返回odsDF表
+      case None => odsDF
+    }
+
+    // 3. 获取当日用户标签
+
+    //4. 将数据保存到kudu表
+    // a. 创建kudu表,存在不删除,主键是
+
+    // b. 将商圈数据保存到kudu表
+
+    // 5.. 关闭资源
+    spark.stop()
+  }
+
+}

@@ -6,7 +6,7 @@ import com.itheima.dmp.utils.SparkSessionUtils
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
-  * 根据经纬度,调用高德API,获取商圈信息,保存到kudu表中 -> 一天一个表  -> 保存数据 创建表的时候,表存在就删除
+  * 根据经纬度,调用高德API,获取商圈信息,保存到kudu表中 -> 将每一天的数据追加到kudu表
   * 1. 构建sparksession实例对象
   * 2. 读取kudu表的数据
   * 3. 抽取方法 -> 根据经纬度获取商圈数据
@@ -34,9 +34,9 @@ object BusinessAreasRunner {
     // 3. 抽取方法 -> 根据经纬度获取商圈数据
     val businessAreasDF: DataFrame = AreaProcessor.processData(odsDF)
 
-    // 4. 保存到kudu表
-    // a. 创建kudu表,存在就删除,主键是 -> geoHash
-    spark.createKuduTable(SINK_TABLE_NAME, businessAreasDF.schema, Seq("geoHash"), isDelete = true)
+    // 4. 保存到kudu表,每天的数据追加到表中
+    // a. 创建kudu表,存在不删除,主键是 -> geo_hash
+    spark.createKuduTable(SINK_TABLE_NAME, businessAreasDF.schema, Seq("geo_hash"), isDelete = false)
 
     // b. 将商圈数据保存到kudu表
     businessAreasDF.saveAsKuduTable(SINK_TABLE_NAME)
