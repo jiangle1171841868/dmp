@@ -20,10 +20,6 @@ object ReportAdsIspProcessor extends ReportProcessor{
 
     val spark: SparkSession = odsDF.sparkSession
 
-    //将df缓存
-    odsDF.persist(StorageLevel.MEMORY_AND_DISK)
-    odsDF.count() //触发缓存
-
     //创建临时试图
     odsDF.createOrReplaceTempView("view_ads_isp")
 

@@ -4,6 +4,7 @@ import com.itheima.dmp.config.AppConfigHelper
 import com.itheima.dmp.report.{ReportAdsAppProcessor, ReportAdsChannelProcessor, ReportAdsDeviceProcessor, ReportAdsIspProcessor, ReportAdsNetworkProcessor, ReportAdsRegionProcessor, ReportRegionProcessor}
 import com.itheima.dmp.utils.SparkSessionUtils
 import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.storage.StorageLevel
 
 /**
   * 生成报表的主类
@@ -27,6 +28,10 @@ object DailyReportRunner {
       case Some(df) => df
       case None => println("查询的数据不存在..."); return
     }
+
+    //将df缓存
+    odsDF.persist(StorageLevel.MEMORY_AND_DISK)
+    odsDF.count() //触发缓存
 
     /// TODO: 3.处理数据
     // TODO: 不同业务类型报表分析，并将结果数据存储Kudu表中
