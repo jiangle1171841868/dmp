@@ -1,10 +1,14 @@
 package com.itheima.dmp.tags
 
 import com.itheima.dmp.`trait`.Processor
+import com.itheima.dmp.beans.UserTags
 import com.itheima.dmp.config.AppConfigHelper
+import com.itheima.dmp.utils.TagUtils
+import org.apache.commons.lang3.StringUtils
 import org.apache.spark.SparkContext
 import org.apache.spark.broadcast.Broadcast
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.{DataFrame, Row}
 
 import scala.collection.mutable
 
@@ -61,7 +65,7 @@ object MakeTagsProcessor extends Processor {
     }
 
     //对dataFrame中每个分区的数据进行标签化操作
-    odsAreaDF.rdd.mapPartitions { rows =>
+    val tagsDF: RDD[UserTags] = odsAreaDF.rdd.mapPartitions { rows =>
 
       rows.map {
         row =>
@@ -84,23 +88,37 @@ object MakeTagsProcessor extends Processor {
           tagsMap ++= Tags4AreaMaker.make(row)
           // 8). App标签（Tags4AppMaker）
           tagsMap ++= Tags4AppMaker.make(row, appDicBroadcast.value)
-        // 9). 设备标签（Tags4DeviceMaker）
-        tagsMap ++= Tags4DeviceMaker.make(row, deviceDicBroadcast.value)
+          // 9). 设备标签（Tags4DeviceMaker）
+          tagsMap ++= Tags4DeviceMaker.make(row, deviceDicBroadcast.value)
 
-        // 其二：每条数据标识符，用字段：uuid
-        //val mainId = row.getAs[String]("uuid")
+          // 其二：每条数据标识符，用字段：uuid
+          val mainId = row.getAs[String]("uuid")
 
-        // 其三：获取每条数据中所有标识符IDs的值
-        //val idsMap: Map[String, String] = getIds(row)
+          // 其三：获取每条数据中所有标识符IDs的值
+          val idsMap: Map[String, String] = getIds(row)
 
-        // 以二元组形式返回
-        // (mainId, tagsMap.toMap)  // 由于Kudu不支持Map数据类型，所以将Map转换为String类型
-        // (mainId, TagUtils.map2Str(idsMap), TagUtils.map2Str(tagsMap.toMap))
-        //UserTags(mainId, TagUtils.map2Str(idsMap), TagUtils.map2Str(tagsMap.toMap))
+          // 由于Kudu不支持Map数据类型，所以将Map转换为String类型
+          UserTags(mainId, TagUtils.map2Str(idsMap), TagUtils.map2Str(tagsMap.toMap))
 
       }
-      null
-    }
 
+    }
+    tagsDF.toDF()
+  }
+
+  /**
+    * 每一行数据，不一定所有的id都有值，根据id的名称来查询值，并且过滤掉不含值的数据
+    *
+    * @param row DataFrame中每行数据
+    */
+  def getIds(row: Row): Map[String, String] = {
+    // a. 获取所有标识符字段名称
+    val ids: Array[String] = AppConfigHelper.ID_FIELDS.split(",")
+
+    // b. 依据标识符Id名称，获取对应值
+    ids
+      .map(id => id -> row.getAs[String](id))
+      .filter { case (_, idValue) => StringUtils.isNotBlank(idValue) }
+      .toMap
   }
 }

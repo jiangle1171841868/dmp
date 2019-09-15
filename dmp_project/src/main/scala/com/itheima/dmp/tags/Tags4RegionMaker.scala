@@ -20,7 +20,7 @@ object Tags4RegionMaker extends TagsMaker {
 
     if (StringUtils.isNotBlank(province)) {
 
-      map += s"PN@$province"
+      map += s"PN@$province" -> 1.0
     }
 
     /**

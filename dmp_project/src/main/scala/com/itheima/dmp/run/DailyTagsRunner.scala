@@ -1,6 +1,7 @@
 package com.itheima.dmp.run
 
 import com.itheima.dmp.config.AppConfigHelper
+import com.itheima.dmp.tags.{HistoryTagsProcessor, MakeTagsProcessor}
 import com.itheima.dmp.utils.{DateUtils, SparkSessionUtils}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -45,10 +46,9 @@ object DailyTagsRunner {
     }
 
     // 2.2  加载area表的数据
-    val optionAreaDF: Option[DataFrame] = spark.readKuduTable(HISTORY_TAGS_TABLE_NAME)
-    optionAreaDF match {
+    val optionAreaDF: Option[DataFrame] = spark.readKuduTable(AREA_TABLE_NAME)
+    val odsWithAreaDF: DataFrame = optionAreaDF match {
 
-      //历史表存在 进行关联
       // 2.3 ods表数据与area表数据关联 左关联
       case Some(areaDF) =>
         odsDF.join(
@@ -61,13 +61,27 @@ object DailyTagsRunner {
     }
 
     // 3. 获取当日用户标签
+    val tagsDF: DataFrame = MakeTagsProcessor.processData(odsWithAreaDF)
 
-    //4. 将数据保存到kudu表
-    // a. 创建kudu表,存在不删除,主键是
+    // 4.获取历史标签数据
+    val historyTagsDFOption: Option[DataFrame] = spark.readKuduTable(HISTORY_TAGS_TABLE_NAME)
+
+    //标签合并
+    val allTagsDF: DataFrame = historyTagsDFOption match {
+      case Some(historyTagsDFOption) =>
+        tagsDF.union(HistoryTagsProcessor.processData(historyTagsDFOption)) //union 就相当于sql中的union all
+      case None => tagsDF
+    }
+
+
+    //5. 将数据保存到kudu表
+    // a. 创建kudu表,存在不删除,主键是main_id
+    spark.createKuduTable(TODAY_TAGS_TABLE, allTagsDF.schema, Seq("main_id"))
 
     // b. 将商圈数据保存到kudu表
+    allTagsDF.saveAsKuduTable(TODAY_TAGS_TABLE)
 
-    // 5.. 关闭资源
+    // 6. 关闭资源
     spark.stop()
   }
 
