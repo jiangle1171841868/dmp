@@ -11,7 +11,7 @@ object PmtETLRunner {
 
   def main(args: Array[String]): Unit = {
 
-    /// TODO: 1.构架sparkSession实例对象
+    /// TODO: 1.构建sparkSession实例对象
     val spark: SparkSession = SparkSessionUtils.createSparkSession(PmtETLRunner.getClass)
 
     /// TODO: 2.读取json格式的数据

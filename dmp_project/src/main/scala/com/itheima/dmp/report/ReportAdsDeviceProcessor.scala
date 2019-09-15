@@ -23,6 +23,7 @@ object ReportAdsDeviceProcessor extends ReportProcessor{
 
     //将df缓存
     odsDF.persist(StorageLevel.MEMORY_AND_DISK)
+    odsDF.count() //触发缓存
 
     //创建临时试图
     odsDF.createOrReplaceTempView("view_ads_device")

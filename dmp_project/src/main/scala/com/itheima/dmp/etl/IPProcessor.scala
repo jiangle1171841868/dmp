@@ -46,7 +46,7 @@ object IPProcessor extends Processor {
         val region: IpRegion = IPUtils.convertIp2Region(ip, searcher, service)
 
         //c.将省市 经纬度和geoHash 添加到每行数据的尾部  -> 添加在后面 +:  添加在后面 :+ 添加的元素放在 + 那一边
-        val newSeq = row.toSeq :+
+        val newSeq: Seq[Any] = row.toSeq :+
           region.province :+
           region.city :+
           region.latitude :+
