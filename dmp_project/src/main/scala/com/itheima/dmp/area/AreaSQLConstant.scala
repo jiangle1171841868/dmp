@@ -14,10 +14,10 @@ object AreaSQLConstant {
           |		$areaViewName AS d
           |	LEFT JOIN $odsViewName AS o
           | ON
-          |     longitude >= 73.67
-          |	AND longitude <= 135.06
-          |	AND latitude >= 3.87
-          |	AND latitude <= 53.56
+          |     o.longitude >= 73.67
+          |	AND o.longitude <= 135.06
+          |	AND o.latitude >= 3.87
+          |	AND o.latitude <= 53.56
           |	AND d.geo_hash = o.geoHash
           |	AND d.area IS NOT NULL
           |	GROUP BY

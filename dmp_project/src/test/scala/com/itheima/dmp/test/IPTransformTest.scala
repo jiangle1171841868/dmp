@@ -34,7 +34,7 @@ object IPTransformTest {
     val searcher = new DbSearcher(new DbConfig(), dbFile)
 
     /// TODO: 2.解析ip地址 获取region  中国|0|安徽省|滁州市|电信
-    val region: String = searcher.binarySearch(ip).getRegion
+    val region: String = searcher.btreeSearch(ip).getRegion
     println(region)
 
     /// TODO: 3.获取需要的省市信息

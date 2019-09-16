@@ -11,11 +11,16 @@ import org.apache.spark.sql.Row
 object Tags4AreaMaker extends TagsMaker {
   override def make(row: Row, dic: Map[String, String]): Map[String, Double] = {
 
-    row.getAs[String]("area")
-      .split(":")
-      .filter(area => StringUtils.isNotBlank(area))
-      .map(area => (s"BA@$area" -> 1.0))
-      .toMap
-  }
+    val area: String = row.getAs[String]("area")
 
+    // 商圈数据中有写有数据,有写没有数据 是None  ->   需要过滤出None的数据
+    if (!None.equals("area")) {
+      area.split(":")
+        .filter(area => StringUtils.isNotBlank(area))
+        .map(area => (s"BA@$area" -> 1.0))
+        .toMap
+    }else{
+      Map[String, Double]()
+    }
+  }
 }

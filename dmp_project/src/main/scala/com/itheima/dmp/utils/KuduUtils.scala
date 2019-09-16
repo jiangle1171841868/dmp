@@ -5,7 +5,6 @@ import org.apache.kudu.client.CreateTableOptions
 import org.apache.kudu.spark.kudu.KuduContext
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.{DataFrame, SaveMode, SparkSession}
-import org.apache.spark.sql.catalyst.ScalaReflection.Schema
 import org.apache.spark.sql.types.StructType
 
 class KuduUtils extends Logging {
@@ -47,7 +46,7 @@ class KuduUtils extends Logging {
     * @param keys
     * @param isDelete 表存在是否允许删除
     */
-  def createKuduTable(tableName: String, schema: StructType, keys: Seq[String], isDelete: Boolean = true) = {
+  def createKuduTable(tableName: String, schema: StructType, keys: Seq[String], isDelete: Boolean = true):  Unit = {
 
     //1.判断表是否存在  存在判断是否可以删除
     if (context.tableExists(tableName)) {
@@ -57,8 +56,9 @@ class KuduUtils extends Logging {
         logInfo(s"表 $tableName 在kudu中已经存在,已经删除....")
       } else {
         logInfo(s"表 $tableName 在kudu中已经存在,不允许删除....")
+        return
       }
-    } else {
+    }
 
       //2.表不存在开始创建
       //a.设置表的分区  默认按照主键进行hash分区
@@ -76,7 +76,7 @@ class KuduUtils extends Logging {
 
       //d.打印日志
       logInfo(s"kudu表 $tableName 创建成功.......")
-    }
+
   }
 
   /**
@@ -107,7 +107,7 @@ class KuduUtils extends Logging {
     import org.apache.kudu.spark.kudu.KuduDataFrameWriter
     //a.判断dataframe是否能为空
     if (dataFrame == null) {
-      logInfo("DataFRame为空,重新构造新的非空DataFrame来添加数据...")
+      logInfo("DataFrame为空,重新构造新的非空DataFrame来添加数据...")
     } else (
 
       //b.插入数据

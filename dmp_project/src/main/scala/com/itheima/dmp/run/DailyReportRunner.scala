@@ -50,7 +50,7 @@ object DailyReportRunner {
     // g. 广告渠道统计：ads_channel_analysis
     ReportAdsChannelProcessor.processData(odsDF)
 
-    Thread.sleep(1000000)
+    //Thread.sleep(1000000)
 
     /// TODO: 4.应用完成之后,关闭资源
     spark.stop()

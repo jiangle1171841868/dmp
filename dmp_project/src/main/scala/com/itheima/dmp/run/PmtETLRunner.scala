@@ -23,7 +23,7 @@ object PmtETLRunner {
     /// TODO: 4.保存到kudu表
     import com.itheima.dmp.utils.KuduUtils._
 
-    //a.创建表 表的名称 -> ods_adinfo_20190914
+    //a.创建表 表的名称 -> ods_adinfo_20190914  -> 每天一个表
     val tableName: String = AppConfigHelper.AD_MAIN_TABLE_NAME
     val schema: StructType = kuduDF.schema
     val keys: Seq[String] = Seq("uuid")

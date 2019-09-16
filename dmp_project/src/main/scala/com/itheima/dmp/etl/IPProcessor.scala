@@ -29,7 +29,7 @@ object IPProcessor extends Processor {
 
     val spark = dataframe.sparkSession
 
-    /// TODO: 1.将dataframe转化为RDD[Row]进行处理
+    /// TODO: 1. 将dataframe转化为RDD[Row]进行处理
     val newRDD: RDD[Row] = dataframe.rdd.mapPartitions { rows =>
 
       //创建DbSearcher实例对象
@@ -37,15 +37,16 @@ object IPProcessor extends Processor {
       //创建LookupService实例对象
       val service: LookupService = new LookupService(AppConfigHelper.IPS_DATA_GEO_PATH, LookupService.GEOIP_MEMORY_CACHE)
 
-      /// TODO: 2.对每个分区数据进行操作,获取ip,调用工具类解析ip 获取省市 经纬度和geoHash
+      /// TODO: 2. 对每个分区数据(Row)进行操作,获取ip,调用工具类解析ip 获取省市 经纬度和geoHash
       rows.map { row =>
-        //a.获取ip
+
+        // a. 获取ip
         val ip = row.getAs[String]("ip")
 
-        //b.解析ip
+        // b. 解析ip
         val region: IPRegion = IPUtils.convertIp2Region(ip, searcher, service)
 
-        //c.将省市 经纬度和geoHash 添加到每行数据的尾部  -> 添加在后面 +:  添加在后面 :+ 添加的元素放在 + 那一边
+        // c. 将省市 经纬度和geoHash 添加到每行数据的尾部  -> 添加在后面 +:  添加在后面 :+ 添加的元素放在 + 那一边
         val newSeq: Seq[Any] = row.toSeq :+
           region.province :+
           region.city :+
@@ -53,12 +54,12 @@ object IPProcessor extends Processor {
           region.longitude :+
           region.geoHash
 
-        //d.返回新的row
+        // d. 返回新的row
         Row.fromSeq(newSeq)
       }
     }
 
-    /// TODO: 3.在原来schema基础上添加  新添加字段的schema   ->  创建新的DataFrame
+    /// TODO: 3. 在原来schema基础上添加  新添加字段的schema   ->  创建新的DataFrame
     //a..在原来schema基础上添加  新添加字段的schema
     val newSchema = dataframe.schema
       .add("province", StringType, true)
@@ -96,7 +97,7 @@ object IPProcessor extends Processor {
       'age, 'sex, 'geoHash
     )
 
-    //val kuduDF = newDF.select(selectColumns: _*) // _* 可变参数 -> 添加集合中的列
+    //val kuduDF = newDF.select(selectColumns: _*) // _* 可变参数 -> 将集合转换为一个个元素
 
     //b.方式二:drop:参数 字段名   -> 直接根据字段名删除重复的字段
     val kuduDF: DataFrame = newDF.drop("provincename", "cityname", "lang", "lat")

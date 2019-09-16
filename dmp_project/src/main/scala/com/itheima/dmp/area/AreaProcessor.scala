@@ -62,7 +62,7 @@ object AreaProcessor extends Processor {
     * @param dataframe
     * @return
     */
-  def processDataV2(dataframe: DataFrame): DataFrame = {
+  override def processData(dataframe: DataFrame): DataFrame = {
 
     val spark = dataframe.sparkSession
     import spark.implicits._
@@ -126,7 +126,7 @@ object AreaProcessor extends Processor {
     * @param dataframe
     * @return
     */
-  override def processData(dataframe: DataFrame): DataFrame = {
+  def processDataV2(dataframe: DataFrame): DataFrame = {
 
     val BUSINESS_AREAS_TABLE_NAME = AppConfigHelper.BUSINESS_AREAS_TABLE_NAME
     val spark: SparkSession = dataframe.sparkSession
