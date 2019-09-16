@@ -35,7 +35,6 @@ object DailyTagsRunner {
       AppConfigHelper.TAGS_TABLE_NAME_PREFIX + DateUtils.getTodayDate()
     }
 
-
     // 1. 构建sparksession实例对象
     val spark: SparkSession = SparkSessionUtils.createSparkSession(this.getClass)
 
@@ -53,7 +52,7 @@ object DailyTagsRunner {
     val optionAreaDF: Option[DataFrame] = spark.readKuduTable(AREA_TABLE_NAME)
     val odsWithAreaDF: DataFrame = optionAreaDF match {
 
-      // 2.3 ods表数据与area表数据关联 左关联
+      // 2.3 ods表数据与area表数据关联 左关联 -> 表存在就join 不存在就直接返回odsDF
       case Some(areaDF) =>
         odsDF.join(
           areaDF, //关联的表

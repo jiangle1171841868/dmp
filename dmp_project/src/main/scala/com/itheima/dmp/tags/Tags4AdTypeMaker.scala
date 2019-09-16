@@ -4,8 +4,10 @@ import com.itheima.dmp.`trait`.TagsMaker
 import org.apache.commons.lang3.StringUtils
 import org.apache.spark.sql.Row
 
+/**
+  * 广告类型标签
+  */
 object Tags4AdTypeMaker extends TagsMaker {
-
 
   override def make(row: Row, dic: Map[String, String]): Map[String, Double] = {
 

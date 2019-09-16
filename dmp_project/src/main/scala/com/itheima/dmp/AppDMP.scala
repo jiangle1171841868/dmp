@@ -13,6 +13,7 @@ object AppDMP {
       //a.创建sparkConf对象
       val sparkConf: SparkConf = new SparkConf()
         .setAppName(this.getClass.getSimpleName.stripSuffix("$"))
+
       //b.判断是本地模式还是集群模式运行  本地模式运行 -> 设置local[] 集群模式 -> 在提交任务的时候设置
       if (AppConfigHelper.SPARK_APP_LOCAL_MODE.toBoolean) {
         sparkConf.setMaster(AppConfigHelper.SPARK_APP_MASTER)

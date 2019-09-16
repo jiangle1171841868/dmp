@@ -16,25 +16,23 @@ object HistoryTagsProcessor extends Processor {
     val spark = dataframe.sparkSession
     import spark.implicits._
 
-    //将dataframe转化为DataSet进行处理
+    // 将dataFrame转化为DataSet处理
     val coeffTagsDS: Dataset[UserTags] = dataframe.as[UserTags].mapPartitions { iter =>
 
-      iter.map { case UserTags(mainId, idsStr, tagsStr) =>
+      iter.map { case UserTags(main_id, ids, tags) =>
 
-        //将用户标签tagsStr转化为map集合
-        val tagsMap: Map[String, Double] = TagUtils.tagsStr2Map(tagsStr)
+        // 1. 将字符串标签tags转化为map集合
+        val tagsMap: Map[String, Double] = TagUtils.tagsStr2Map(tags)
 
-        //修改权重
-        val coeffTagsMap: Map[String, Double] = tagsMap.map {
-          case (key, value) => (key, value * TAG_COEFFICIENT)
-        }
+        // 2. 对标签的权重进行操作 -> 乘以衰减因子
+        val coeffTagsMap = tagsMap.map { case (tagKey, tagValue) => (tagKey, tagValue * TAG_COEFFICIENT) }
 
-        //返回
-        UserTags(mainId, idsStr, TagUtils.map2Str(coeffTagsMap))
+        // 3. 将coeffTagsMap转化为字符串,封装为样例类返回
+        UserTags(main_id, ids, TagUtils.map2Str(coeffTagsMap))
       }
     }
 
-    // 返回历史标签DataFrame
+    // 返回历史标签
     coeffTagsDS.toDF()
   }
 

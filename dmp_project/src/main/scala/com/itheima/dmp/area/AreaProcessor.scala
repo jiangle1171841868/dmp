@@ -3,7 +3,7 @@ package com.itheima.dmp.area
 import com.itheima.dmp.`trait`.Processor
 import com.itheima.dmp.config.AppConfigHelper
 import com.itheima.dmp.utils.HttpUtils
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.sql.expressions.UserDefinedFunction
 
 object AreaProcessor extends Processor {
@@ -62,15 +62,13 @@ object AreaProcessor extends Processor {
     * @param dataframe
     * @return
     */
-  override def processData(dataframe: DataFrame): DataFrame = {
+  def processDataV2(dataframe: DataFrame): DataFrame = {
 
     val spark = dataframe.sparkSession
     import spark.implicits._
     import org.apache.spark.sql.functions._
     import com.itheima.dmp.utils.KuduUtils._
 
-    //自定义一个UDF函数,将工具类中的方法使用空格 + _ 转化为函数  方法名  _  --》  函数
-    val get_area: UserDefinedFunction = udf(HttpUtils.loadGaode2Area _)
 
     val geoHashDF: DataFrame = dataframe
 
@@ -108,7 +106,11 @@ object AreaProcessor extends Processor {
       case None => geoHashDF
     }
     logWarning(s"去重已存在商圈信息表的数据后数据量: ${geoHashWithAreaDF.count()} ...............")
+
     //6. 自定义UDF函数,传入平均经纬度,获取商圈信息
+    //自定义一个UDF函数,将工具类中的方法使用空格 + _ 转化为函数  方法名  _  --》  函数
+    val get_area: UserDefinedFunction = udf(HttpUtils.loadGaode2Area _)
+
     val areaDF: DataFrame = geoHashWithAreaDF.select(
       $"geoHash".as("geo_hash"),
       get_area($"avg_longitude", $"avg_latitude").as("area")
@@ -116,6 +118,41 @@ object AreaProcessor extends Processor {
 
     //6. 返回
     areaDF
+  }
+
+  /**
+    * 使用SQL语句,生成商圈信息表
+    *
+    * @param dataframe
+    * @return
+    */
+  override def processData(dataframe: DataFrame): DataFrame = {
+
+    val BUSINESS_AREAS_TABLE_NAME = AppConfigHelper.BUSINESS_AREAS_TABLE_NAME
+    val spark: SparkSession = dataframe.sparkSession
+
+    import com.itheima.dmp.utils.KuduUtils._
+
+    // 1. 将表注册为视图
+    // a. 将ods表注册为临时视图
+    dataframe.createOrReplaceTempView("viea_ods")
+    // b. 将area表注册为临时视图
+    val areaDF: DataFrame = spark.readKuduTable(BUSINESS_AREAS_TABLE_NAME).getOrElse(dataframe)
+
+    areaDF.createOrReplaceTempView("view_area")
+
+    // 2. 自定义UDF函数
+    spark.udf.register(
+      "get_area", //函数名
+      HttpUtils.loadGaode2Area _ //函数   -> 方法加下划线转化为函数
+    )
+
+    // 3. 执行SQL查询
+    // a. 获取SQL语句
+    val areaSQL: String = AreaSQLConstant.areaSQL("viea_ods", "view_area")
+    // b. 执行查询
+    spark.sql(areaSQL)
+
   }
 
 }

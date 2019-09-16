@@ -84,6 +84,14 @@
             <artifactId>graphframes</artifactId>
             <version>0.7.0-spark2.4-s_2.11</version>
         </dependency>-->
+
+        <!--导入graphframes依赖-->
+        <!-- https://mvnrepository.com/artifact/graphframes/graphframes -->
+        <dependency>
+            <groupId>graphframes</groupId>
+            <artifactId>graphframes</artifactId>
+            <version>0.6.0-spark2.2-s_2.11</version>
+        </dependency>
         <!-- Hadoop Client -->
         <dependency>
             <groupId>org.apache.hadoop</groupId>
@@ -203,9 +211,9 @@
         </dependency>
 
         <dependency>
-              <groupId>com.squareup.okhttp3</groupId>
-              <artifactId>okhttp</artifactId>
-              <version>3.14.2</version>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.14.2</version>
         </dependency>
 
     </dependencies>

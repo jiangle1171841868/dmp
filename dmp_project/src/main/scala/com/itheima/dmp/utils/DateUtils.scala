@@ -35,4 +35,13 @@ object DateUtils {
 
   }
 
+  /**
+    * 测试工具类
+    */
+  def main(args: Array[String]): Unit = {
+
+    println(getTodayDate())
+    println(getYesterdayDate())
+  }
+
 }

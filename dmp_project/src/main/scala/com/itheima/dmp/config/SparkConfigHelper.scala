@@ -20,7 +20,7 @@ class SparkConfigHelper(sparkBuild: SparkSession.Builder) {
   /// TODO: 2.封装方法 读取参数封装到spark中
   def loadSparkConf(): SparkSession.Builder = {
 
-    //a.获取配置文件信息 获取的是java中的set集合
+    //a.获取配置文件信息 获取的是java中的set集合,保证唯一性
     val entrySet: util.Set[Map.Entry[String, ConfigValue]] = config.entrySet()
 
     //b.遍历集合  将java集合转化为scala

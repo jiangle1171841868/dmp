@@ -13,13 +13,13 @@ import org.apache.spark.sql.{DataFrame, Row}
 import scala.collection.mutable
 
 /**
-  *  * 今日ODS表和AREA表生成今日用户标签
-  *  */
+  * 今日ODS表和AREA表生成今日用户标签
+  */
 object MakeTagsProcessor extends Processor {
 
   /**
     *  生成标签数据：广告标识、渠道、关键词、省市、性别、年龄、商圈、App名称和设备
-    *  
+    *
     * */
   override def processData(odsAreaDF: DataFrame): DataFrame = {
 
@@ -112,6 +112,7 @@ object MakeTagsProcessor extends Processor {
     * @param row DataFrame中每行数据
     */
   def getIds(row: Row): Map[String, String] = {
+
     // a. 获取所有标识符字段名称
     val ids: Array[String] = AppConfigHelper.ID_FIELDS.split(",")
 
