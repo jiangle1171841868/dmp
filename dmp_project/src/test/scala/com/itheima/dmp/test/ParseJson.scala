@@ -2,7 +2,7 @@ package com.itheima.dmp.test
 
 
 import org.json4s
-import org.json4s._
+import org.json4s.JValue
 import org.json4s.jackson.JsonMethods._
 
 
