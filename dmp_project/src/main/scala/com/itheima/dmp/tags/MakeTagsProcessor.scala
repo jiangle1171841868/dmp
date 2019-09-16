@@ -18,8 +18,9 @@ import scala.collection.mutable
 object MakeTagsProcessor extends Processor {
 
   /**
-    *  * 生成标签数据：广告标识、渠道、关键词、省市、性别、年龄、商圈、App名称和设备
-    *  */
+    *  生成标签数据：广告标识、渠道、关键词、省市、性别、年龄、商圈、App名称和设备
+    *  
+    * */
   override def processData(odsAreaDF: DataFrame): DataFrame = {
 
     val spark = odsAreaDF.sparkSession
@@ -34,7 +35,6 @@ object MakeTagsProcessor extends Processor {
       * b. 获取id集合
       * c. 获取主ID
       * d. 返回样例类
-      *
       **/
 
     //加载字典数据,使用SparkContext中广播变量将字段广播到Exexutor内存中

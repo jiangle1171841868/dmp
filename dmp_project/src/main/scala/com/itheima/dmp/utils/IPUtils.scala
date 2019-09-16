@@ -1,7 +1,7 @@
 package com.itheima.dmp.utils
 
 import ch.hsr.geohash.GeoHash
-import com.itheima.dmp.beans.IpRegion
+import com.itheima.dmp.beans.IPRegion
 import com.itheima.dmp.config.AppConfigHelper
 import com.maxmind.geoip.{Location, LookupService}
 import org.lionsoul.ip2region.{DataBlock, DbConfig, DbSearcher}
@@ -15,7 +15,7 @@ object IPUtils {
     * @param ip
     * @return
     */
-  def convertIp2Region(ip: String): IpRegion = {
+  def convertIp2Region(ip: String): IPRegion = {
 
     /// TODO: 1.将ip转换为省市
     val searcher = new DbSearcher(new DbConfig(), AppConfigHelper.IPS_DATA_REGION_PATH)
@@ -32,7 +32,7 @@ object IPUtils {
     val geoHash: String = GeoHash.geoHashStringWithCharacterPrecision(latitude, longitude, 8)
 
     /// TODO: 4.返回样例对象
-    IpRegion(ip, longitude, latitude, province, city, geoHash)
+    IPRegion(ip, longitude, latitude, province, city, geoHash)
   }
 
   /**
@@ -42,7 +42,7 @@ object IPUtils {
     * @param service
     * @return
     */
-  def convertIp2Region(ip: String, searcher: DbSearcher, service: LookupService): IpRegion = {
+  def convertIp2Region(ip: String, searcher: DbSearcher, service: LookupService): IPRegion = {
 
     /// TODO: 1.将ip转换为省市
     val searcher: DbSearcher = new DbSearcher(new DbConfig(), AppConfigHelper.IPS_DATA_REGION_PATH)
@@ -59,7 +59,7 @@ object IPUtils {
     val geoHash: String = GeoHash.geoHashStringWithCharacterPrecision(latitude, longitude, 8)
 
     /// TODO: 4.返回样例对象
-    IpRegion(ip, longitude, latitude, province, city, geoHash)
+    IPRegion(ip, longitude, latitude, province, city, geoHash)
   }
 
   /**
@@ -67,7 +67,7 @@ object IPUtils {
     */
   def main(args: Array[String]): Unit = {
 
-    val region: IpRegion = convertIp2Region("106.87.131.39")
+    val region: IPRegion = convertIp2Region("106.87.131.39")
     println(region)
   }
 }

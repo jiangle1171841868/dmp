@@ -39,7 +39,7 @@ object TagUtils {
     for (tag <- tags) {
 
       val Array(key, value) = tag.stripPrefix("(") //脱去前面的括号
-        .stripSuffix(")") //脱去后面的括号
+        .stripSuffix("(")//脱去后面的括号
         .split("->") //按照-> 切割出k v
 
       // c. 将数据数据保存到map集合

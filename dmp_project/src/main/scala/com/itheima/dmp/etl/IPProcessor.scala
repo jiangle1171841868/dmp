@@ -2,7 +2,7 @@ package com.itheima.dmp.etl
 
 
 import com.itheima.dmp.`trait`.Processor
-import com.itheima.dmp.beans.IpRegion
+import com.itheima.dmp.beans.IPRegion
 import com.itheima.dmp.config.AppConfigHelper
 import com.itheima.dmp.utils.IPUtils
 import com.maxmind.geoip.LookupService
@@ -43,7 +43,7 @@ object IPProcessor extends Processor {
         val ip = row.getAs[String]("ip")
 
         //b.解析ip
-        val region: IpRegion = IPUtils.convertIp2Region(ip, searcher, service)
+        val region: IPRegion = IPUtils.convertIp2Region(ip, searcher, service)
 
         //c.将省市 经纬度和geoHash 添加到每行数据的尾部  -> 添加在后面 +:  添加在后面 :+ 添加的元素放在 + 那一边
         val newSeq: Seq[Any] = row.toSeq :+

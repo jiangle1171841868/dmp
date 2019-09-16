@@ -22,31 +22,35 @@ object HttpUtils {
     // 1. 拼接url 基本url + key + 经纬度信息
     val url: String = AppConfigHelper.AMAP_URL + s"$longitude,$latitude"
 
-    // 2. 创建OkHttpClient实例对象
-    val httpClient = new OkHttpClient.Builder()
-      .connectTimeout(Duration.ofSeconds(60L)) //设置连接超时时间
-      .build()
+    try {
+      // 2. 创建OkHttpClient实例对象
+      val httpClient = new OkHttpClient.Builder()
+        .connectTimeout(Duration.ofSeconds(60L)) //设置连接超时时间
+        .build()
 
-    // 3. 创建请求对象,构造者模式构建,是java中的类  -> 需要 new Request.Builder()
-    val request: Request = new Request.Builder()
-      .url(url) //请求url
-      .get() //请求方式
-      .build()
+      // 3. 创建请求对象,构造者模式构建,是java中的类  -> 需要 new Request.Builder()
+      val request: Request = new Request.Builder()
+        .url(url) //请求url
+        .get() //请求方式
+        .build()
 
-    // 4. 发送请求,获取结果
-    val response: Response = httpClient.newCall(request).execute()
+      // 4. 发送请求,获取结果
+      val response: Response = httpClient.newCall(request).execute()
 
-    // 5. 打印结果
-    //a.判断是否请求成功 ->   状态码范围  ->  code >= 200 && code < 300
-    if (response.isSuccessful) {
-      //b.获取响应体中的数据
-      val result: String = response.body().string()
+      // 5. 打印结果
+      //a.判断是否请求成功 ->   状态码范围  ->  code >= 200 && code < 300
+      if (response.isSuccessful) {
+        //b.获取响应体中的数据
+        val result: String = response.body().string()
 
-      //c.获取成功.返回json数据
-      Some(result)
-    } else {
-      //d. 请求不成功,返回None
-      None
+        //c.获取成功.返回json数据
+        Some(result)
+      } else {
+        //d. 请求不成功,返回None
+        None
+      }
+    } catch {
+      case e: Exception => e.printStackTrace(); None
     }
   }
 
@@ -96,7 +100,7 @@ object HttpUtils {
 
     // 2. 有数据就解析
     jsonOption match {
-      case Some(jsonOption) => parseJson(jsonOption)
+      case Some(jsonStr) => parseJson(jsonStr)
       case None => ""
     }
   }

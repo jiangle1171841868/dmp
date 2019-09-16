@@ -35,6 +35,7 @@ object DailyTagsRunner {
       AppConfigHelper.TAGS_TABLE_NAME_PREFIX + DateUtils.getTodayDate()
     }
 
+
     // 1. 构建sparksession实例对象
     val spark: SparkSession = SparkSessionUtils.createSparkSession(this.getClass)
 
@@ -56,10 +57,10 @@ object DailyTagsRunner {
       case Some(areaDF) =>
         odsDF.join(
           areaDF, //关联的表
-          odsDF.col("geoHash").equalTo(areaDF.col("geo_hash")), //关联条件
+          odsDF.col("geoHash").equalTo(areaDF.col("geo_hash")), //关联条件,可以调用and方法设置多个条件
           "left" //关联方式
         )
-      //历史表不存在,返回odsDF表
+      //area表不存在,返回odsDF表
       case None => odsDF
     }
 
@@ -79,10 +80,10 @@ object DailyTagsRunner {
 
     //5. 将数据保存到kudu表
     // a. 创建kudu表,存在不删除,主键是main_id
-    spark.createKuduTable(TODAY_TAGS_TABLE, allTagsDF.schema, Seq("main_id"))
+    spark.createKuduTable(TODAY_TAGS_TABLE, allTagsDF.schema, Seq("main_id"), isDelete = false)
 
-    // b. 将商圈数据保存到kudu表
-    allTagsDF.saveAsKuduTable(TODAY_TAGS_TABLE)
+    // b. 将数据保存到kudu表
+    allTagsDF saveAsKuduTable (TODAY_TAGS_TABLE)
 
     // 6. 关闭资源
     spark.stop()
