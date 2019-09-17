@@ -17,7 +17,7 @@ object TagUtils {
 
     kvMap
       .toList.sortBy(kv => kv._1) //按照key进行排序
-      .map { case (key, value) => s"($key=>$value)" } //转化为字符串   ->  (k1->v1)
+      .map { case (key, value) => s"($key->$value)" } //转化为字符串   ->  (k1->v1)
       .mkString(",") //使用逗号连接集合中的元素   ->  (k1->v1),(k2->v2),(k3->v3)
 
   }

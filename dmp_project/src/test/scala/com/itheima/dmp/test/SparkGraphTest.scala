@@ -26,7 +26,11 @@ object SparkGraphTest {
       (session, session.sparkContext)
     }
 
-    // 2. 图中顶点数据 -> VertexId就是Long类型的别称  ->  顶点的属性是二元组
+    /**
+      * 2. 图中顶点数据   ->   顶点数据是二元组(顶点ID,顶点属性)
+      *                  -    顶点ID      ->    VertexId    就是Long类型的别称
+      *                  -    顶点属性     ->    可以是一个值,也可以是多值
+      */
     val userVertices: RDD[(VertexId, (String, String))] = sc.parallelize(
       List(
         (3L, ("rxin", "student")), (7L, ("jgonzal", "postdoc")),
@@ -37,9 +41,9 @@ object SparkGraphTest {
     // 3. 图中边的数据,边由两个顶点和属性组成
     /**
       * case class Edge[@specialized(Char, Int, Boolean, Byte, Long, Float, Double) ED] (
-      *     - var srcId: VertexId = 0,                 ->  源顶点的id
-      *     - var dstId: VertexId = 0,                 ->  目标顶点的id
-      *     - var attr: ED = null.asInstanceOf[ED])    ->  边的属性
+      *     - var srcId: VertexId = 0,                 ->      源顶点的id
+      *     - var dstId: VertexId = 0,                 ->      目标顶点的id
+      *     - var attr: ED = null.asInstanceOf[ED])    ->      边的属性
       */
     val relationshipEdges: RDD[Edge[String]] = sc.parallelize(
       List(
@@ -49,7 +53,7 @@ object SparkGraphTest {
     )
 
     // 4. 使用顶点和边构建图
-    // 默认的顶点属性值
+    //    默认的顶点属性值  ->  边中的顶点ID不存在  ->  顶点属性的默认值
     val defaultUserAttr: (String, String) = ("John Doe", "Missing")
 
     //构建图
@@ -68,7 +72,7 @@ object SparkGraphTest {
       defaultVertexAttr = defaultUserAttr
     )
 
-    //缓存图
+    //缓存图  可以直接缓存图   ->  也可以将构建图的RDD缓存
     graph.cache()
 
     //获取所有顶点的数据
@@ -78,18 +82,18 @@ object SparkGraphTest {
     graph.edges.foreach { case (Edge(srcId, dstId, attr)) => s"$srcId -> $dstId 属性 ->  $attr" }
 
     //获取图中顶点属性为教授（prof）用户数
-    val profCount: VertexId =graph.vertices.filter { case (_, (_, pos)) => "prof".equals(pos) }.count()
+    val profCount: VertexId = graph.vertices.filter { case (_, (_, pos)) => "prof".equals(pos) }.count()
 
     println(s"教授的个数为 -> $profCount")
 
     //两个顶点与边组成一个实体EdgeTriplet
     /**
-      * 源端 -> (rxin,student)    终端 -> (jgonzal,postdoc)    边的属性 -> collab
-      * 源端 -> (istoica,prof)    终端 -> (franklin,prof)      边的属性 -> colleague
-      * 源端 -> (franklin,prof)   终端 -> (rxin,student)       边的属性 -> advisor
-      * 源端 -> (franklin,prof)   终端 -> (jgonzal,postdoc)    边的属性 -> pi
+      * 源端   ->    (rxin,student)      终端 ->    (jgonzal,postdoc)      边的属性   -> collab
+      * 源端   ->    (istoica,prof)      终端 ->    (franklin,prof)        边的属性   -> colleague
+      * 源端   ->    (franklin,prof)     终端 ->    (rxin,student)         边的属性   -> advisor
+      * 源端   ->    (franklin,prof)     终端 ->    (jgonzal,postdoc)      边的属性   -> pi
       */
-    graph.triplets.foreach{triplets=>
+    graph.triplets.foreach { triplets =>
       println(s"源端 -> ${triplets.srcAttr} 终端 -> ${triplets.dstAttr} 边的属性 -> ${triplets.attr}")
     }
 

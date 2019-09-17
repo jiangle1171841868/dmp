@@ -1,7 +1,7 @@
 package com.itheima.dmp.run
 
 import com.itheima.dmp.config.AppConfigHelper
-import com.itheima.dmp.tags.{HistoryTagsProcessor, MakeTagsProcessor}
+import com.itheima.dmp.tags.{HistoryTagsProcessor, MakeTagsProcessor, MergeTagsProcessor}
 import com.itheima.dmp.utils.{DateUtils, SparkSessionUtils}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
@@ -77,12 +77,16 @@ object DailyTagsRunner {
     }
 
 
-    //5. 将数据保存到kudu表
+    // 5. 用户统一统一识别  ->  合并标签
+    val userTagsDF: DataFrame = MergeTagsProcessor.processData(allTagsDF)
+    //userTagsDF.printSchema()
+
+    //. 将数据保存到kudu表
     // a. 创建kudu表,存在不删除,主键是main_id
-    spark.createKuduTable(TODAY_TAGS_TABLE, allTagsDF.schema, Seq("main_id"), isDelete = false)
+    spark.createKuduTable(TODAY_TAGS_TABLE, userTagsDF.schema, Seq("main_id"), isDelete = false)
 
     // b. 将数据保存到kudu表
-    allTagsDF saveAsKuduTable (TODAY_TAGS_TABLE)
+    userTagsDF.saveAsKuduTable (TODAY_TAGS_TABLE)
 
     // 6. 关闭资源
     spark.stop()

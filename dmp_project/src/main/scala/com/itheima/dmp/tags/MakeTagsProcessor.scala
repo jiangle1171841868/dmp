@@ -1,7 +1,7 @@
 package com.itheima.dmp.tags
 
 import com.itheima.dmp.`trait`.Processor
-import com.itheima.dmp.beans.UserTags
+import com.itheima.dmp.beans.{IdsWithTags, UserTags}
 import com.itheima.dmp.config.AppConfigHelper
 import com.itheima.dmp.utils.TagUtils
 import org.apache.commons.lang3.StringUtils
@@ -18,9 +18,9 @@ import scala.collection.mutable
 object MakeTagsProcessor extends Processor {
 
   /**
-    *  生成标签数据：广告标识、渠道、关键词、省市、性别、年龄、商圈、App名称和设备
+    * 生成标签数据：广告标识、渠道、关键词、省市、性别、年龄、商圈、App名称和设备
     *
-    * */
+    **/
   override def processData(odsAreaDF: DataFrame): DataFrame = {
 
     val spark = odsAreaDF.sparkSession
@@ -65,7 +65,7 @@ object MakeTagsProcessor extends Processor {
     }
 
     //对dataFrame中每个分区的数据进行标签化操作
-    val tagsDF: RDD[UserTags] = odsAreaDF.rdd.mapPartitions { rows =>
+    val tagsDF: RDD[IdsWithTags] = odsAreaDF.rdd.mapPartitions { rows =>
 
       rows.map {
         row =>
@@ -97,9 +97,11 @@ object MakeTagsProcessor extends Processor {
           // 其三：获取每条数据中所有标识符IDs的值
           val idsMap: Map[String, String] = getIds(row)
 
-          // 由于Kudu不支持Map数据类型，所以将Map转换为String类型
-          UserTags(mainId, TagUtils.map2Str(idsMap), TagUtils.map2Str(tagsMap.toMap))
+          // 版本V1返回值    ->   将Map转换为String类型,封装为RDD[UserTags]  再转化为DataFrame-> 因为kudu不支持Map集合,所以转换为字符串
+          //UserTags(mainId, TagUtils.map2Str(idsMap), TagUtils.map2Str(tagsMap.toMap))
 
+          // 版本V2返回值      ->   今日标签数据处理之后不直接保存带kudu表,为了方便处理,封装Map集合
+          IdsWithTags(mainId, idsMap, tagsMap.toMap)
       }
 
     }
