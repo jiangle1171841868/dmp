@@ -88,6 +88,9 @@ object DailyTagsRunner {
     // b. 将数据保存到kudu表
     userTagsDF.saveAsKuduTable (TODAY_TAGS_TABLE)
 
+    // 将数据保存到ES中
+    EsUtils.saveJsonToEsIndex(userTagsDF, s"dmp_user_tags2/tags_${DateUtils.getTodayDate()}")
+
     // 6. 关闭资源
     spark.stop()
   }

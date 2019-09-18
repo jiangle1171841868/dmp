@@ -52,6 +52,10 @@ object SparkEsDFTest {
     esDF.printSchema()
     esDF.show(10, truncate = false)
 
+    val esdf: DataFrame = spark.esDF("spark-df/persons")
+    esdf.printSchema()
+    esdf.show(10, truncate = false)
+
     sc.stop()
   }
 }

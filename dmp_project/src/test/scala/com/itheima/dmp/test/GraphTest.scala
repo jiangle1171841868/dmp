@@ -187,6 +187,11 @@ object GraphTest {
 
     Thread.sleep(100000)
 
+    // 释放缓存
+    verticesRDD.unpersist()
+    edgesRDD.unpersist()
+
+
     // 应用完成,关闭资源
     sc.stop()
   }

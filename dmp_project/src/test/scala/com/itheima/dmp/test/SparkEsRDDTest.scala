@@ -13,11 +13,11 @@ object SparkEsRDDTest {
       val sparkConf: SparkConf = new SparkConf()
         .setAppName(this.getClass.getSimpleName.stripSuffix("$"))
         .setMaster("local[4]")
-      // b. 设置集成ES相关参数
-      sparkConf.set("es.nodes", "node01,node02,node03")
-      sparkConf.set("es.port", "9200")
-      // 索引库不存在就创建
-      sparkConf.set("es.index.auto.create", "true")
+        // b. 设置集成ES相关参数
+        .set("es.nodes", "node01,node02,node03")
+        .set("es.port", "9200")
+        // 索引库不存在就创建
+        .set("es.index.auto.create", "true")
       // c. 创建SparkContext上下文实例对象
       val context: SparkContext =
         SparkContext.getOrCreate(sparkConf)
@@ -47,6 +47,7 @@ object SparkEsRDDTest {
     // 保存数据到ES
     import org.elasticsearch.spark.rdd.EsSpark
     val caseRdd: RDD[Trip] = sc.parallelize(Seq(upcomingTrip, lastWeekTrip))
+    //第三个参数 ->  id映射
     EsSpark.saveToEs(caseRdd, "spark-class/trips")
 
     // TODO: 数据类型为JSON格式数据，保存ES中
@@ -58,6 +59,9 @@ object SparkEsRDDTest {
 
     val esRDD: RDD[(String, collection.Map[String, AnyRef])] = sc.esRDD("spark-json/airports")
     esRDD.foreach(println)
+
+    val esJsonRDD: RDD[(String, String)] = sc.esJsonRDD("spark-json/airports")
+    esJsonRDD.foreach(println)
 
 
     sc.stop()

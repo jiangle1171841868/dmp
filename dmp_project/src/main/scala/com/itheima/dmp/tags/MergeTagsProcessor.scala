@@ -48,7 +48,7 @@ object MergeTagsProcessor extends Processor {
       // b. 创建集合,收集顶点
       val list = new ListBuffer[(VertexId, String)]()
 
-      // c. 构建主标识mainid的顶点
+      // c. 构建主标识mainid的顶点,携带标签数据 ->  tags
       list += mainId.hashCode.toLong -> s"mainid##$mainId##$tagsStr"
 
       // d. 构建ids标识的顶点
@@ -120,12 +120,12 @@ object MergeTagsProcessor extends Processor {
       .values //RDD[Iterable[(VertexId, String)]]
       .map { iter =>
 
-      // 多次使用迭代器中的数据，将迭代器转换为列表   -> 顶点数据
+      // 多次使用迭代器中的数据，将迭代器转换为列表   ->  顶点数据
       val list: List[(VertexId, String)] = iter.toList
 
       // a. 合并标签：将多个数据标签合并，最终形成用户标签
       val tagsStr: String = list
-        // 过滤出主标识符的顶点 -> 主标识符的顶点中有标签数据tags
+        //顶点中包含主标识符ID和ids标识符   -> 主标识符的顶点中有标签数据tags  ->  过滤出主标识符的顶点  -> 找差异条件进行过滤
         .filter { case (vertexId, vertexAttr) => vertexAttr.startsWith("mainid##") }
         //vertexAttr数据类型  ->  "mainid##$mainId##$tagsStr"
         .map { case (vertexId, vertexAttr) => vertexAttr.split("##")(2) }
@@ -163,9 +163,9 @@ object MergeTagsProcessor extends Processor {
         TagUtils.map2Str(tagsMap ++ tmpMap)
       })
 
-      // b. 合并所有的标识符IDs（非主标识符ID）
-      val idsMap: Map[String, String] = list
-        // 过滤出主标识符的顶点 -> 主标识符的顶点中有标签数据tags
+      // b. 合并所有的标识符IDs（非主标识符ID） -> 一条数据拆分之后转化为一个二元组  ->  转化为Map集合 返回
+      val idsMap: Map[String, String] = list   // list(顶点ID,顶点属性) ->  同一个用户的属性都在迭代器里面 -> 使用map对迭代器中的每一个字符串元素进行操作 -> 转化为二元组封装带map集合
+        // 过滤出非主标识符的顶点 -> 需要ids标识符进行合并
         .filter { case (vertexId, vertexAttr) => !vertexAttr.startsWith("mainid##") }
         // 获取表示符id和value,数据类型 ->  s"$idName->$idValue"
         .map { case ((vertexId, vertexAttr)) =>
@@ -181,6 +181,10 @@ object MergeTagsProcessor extends Processor {
         .filter { case (vertexId, vertexAttr) => vertexAttr.startsWith("mainid##") }
         //随便获取一个就可以作为mainId
         .head._2.split("##")(2)
+
+      //释放缓存
+      verticesRDD.unpersist()
+      edgesRDD.unpersist()
 
       //返回样例类
       UserTags(main_id, TagUtils.map2Str(idsMap), tagsStr)
