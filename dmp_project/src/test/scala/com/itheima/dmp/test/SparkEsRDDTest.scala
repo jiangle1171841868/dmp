@@ -51,8 +51,7 @@ object SparkEsRDDTest {
     EsSpark.saveToEs(caseRdd, "spark-class/trips")
 
     // TODO: 数据类型为JSON格式数据，保存ES中
-    val json1 =
-      """{"reason" : "business", "airport" : "SFO"}"""
+    val json1 ="""{"reason" : "business", "airport" : "SFO"}"""
     val json2 = """{"participants" : 5, "airport" : "OTP"}"""
     val jsonRDD: RDD[String] = sc.parallelize(Seq(json1, json2))
     jsonRDD.saveJsonToEs("spark-json/airports")

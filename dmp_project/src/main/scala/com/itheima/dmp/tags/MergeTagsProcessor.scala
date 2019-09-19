@@ -62,8 +62,8 @@ object MergeTagsProcessor extends Processor {
       // 将list转化Wie不可变集合返回
       list.toList
     }.distinct()
-    verticesRDD.persist(StorageLevel.MEMORY_AND_DISK) // 缓存RDD
-    println(s"构建数据标签的顶点数目: ${verticesRDD.count()}") // 触发缓存
+    //verticesRDD.persist(StorageLevel.MEMORY_AND_DISK) // 缓存RDD
+    //println(s"构建数据标签的顶点数目: ${verticesRDD.count()}") // 触发缓存
 
 
     /**
@@ -96,11 +96,12 @@ object MergeTagsProcessor extends Processor {
       }
       list.toList
     }
-    edgesRDD.persist(StorageLevel.MEMORY_AND_DISK) // 缓存RDD
-    println(s"构建数据标签的边数目: ${edgesRDD.count()}") // 触发缓存
+    //edgesRDD.persist(StorageLevel.MEMORY_AND_DISK) // 缓存RDD
+   // println(s"构建数据标签的边数目: ${edgesRDD.count()}") // 触发缓存
 
     // 5. 构建图
     val graph = Graph(verticesRDD, edgesRDD)
+    graph.cache()
 
     // 6. 构建连通图
     val ccGraph: Graph[VertexId, String] = graph.connectedComponents()
@@ -182,14 +183,14 @@ object MergeTagsProcessor extends Processor {
         //随便获取一个就可以作为mainId
         .head._2.split("##")(2)
 
-      //释放缓存
-      verticesRDD.unpersist()
-      edgesRDD.unpersist()
+
 
       //返回样例类
       UserTags(main_id, TagUtils.map2Str(idsMap), tagsStr)
 
     }
+
+    graph.unpersist()
 
     // 返回DF
     userTagsRDD.toDF()

@@ -2,7 +2,7 @@ package com.itheima.dmp.run
 
 import com.itheima.dmp.config.AppConfigHelper
 import com.itheima.dmp.tags.{HistoryTagsProcessor, MakeTagsProcessor, MergeTagsProcessor}
-import com.itheima.dmp.utils.{DateUtils, SparkSessionUtils}
+import com.itheima.dmp.utils.{DateUtils, EsUtils, SparkSessionUtils}
 import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
@@ -89,7 +89,9 @@ object DailyTagsRunner {
     userTagsDF.saveAsKuduTable (TODAY_TAGS_TABLE)
 
     // 将数据保存到ES中
-    EsUtils.saveJsonToEsIndex(userTagsDF, s"dmp_user_tags2/tags_${DateUtils.getTodayDate()}")
+    EsUtils.saveMapToEsIndex(userTagsDF, s"dmp_user_tags2/tags_${DateUtils.getTodayDate()}")
+
+    Thread.sleep(10000000)
 
     // 6. 关闭资源
     spark.stop()
