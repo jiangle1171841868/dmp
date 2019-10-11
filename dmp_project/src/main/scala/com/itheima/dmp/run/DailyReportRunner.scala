@@ -8,10 +8,10 @@ import org.apache.spark.storage.StorageLevel
 
 /**
   * 生成报表的主类
-  * 1.构建SparkSession
-  * 2.加载ods数据
-  * 3.处理数据
-  * 4.应用完成之后,关闭资源
+  *    - 1. 构建SparkSession
+  *    - 2. 加载ods数据         ->   每天一个表
+  *    - 3. 处理数据            ->   每天定时统计,添加日期字段,便于查看
+  *    - 4. 应用完成之后,关闭资源
   */
 object DailyReportRunner {
 
@@ -50,7 +50,10 @@ object DailyReportRunner {
     // g. 广告渠道统计：ads_channel_analysis
     ReportAdsChannelProcessor.processData(odsDF)
 
-    //Thread.sleep(1000000)
+    Thread.sleep(1000000)
+
+    // 释放缓存
+    odsDF.unpersist()
 
     /// TODO: 4.应用完成之后,关闭资源
     spark.stop()

@@ -30,8 +30,8 @@ object HttpUtils {
 
       // 3. 创建请求对象,构造者模式构建,是java中的类  -> 需要 new Request.Builder()
       val request: Request = new Request.Builder()
-        .url(url) //请求url
-        .get() //请求方式
+        .url(url)   //请求url
+        .get()     //请求方式
         .build()
 
       // 4. 发送请求,获取结果

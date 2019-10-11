@@ -76,7 +76,7 @@ object AreaProcessor extends Processor {
       .select($"geoHash", $"longitude", $"latitude")
       // 2. 根据经纬度过滤出非大陆的数据
       .filter($"longitude".geq(73.67).and($"longitude".leq(135.06)).and($"latitude".geq(3.87).and($"latitude".leq(53.56))))
-      //3. 按照geoHash分组去重,获取组内经纬度的平均值
+      //3. 按照geoHash分组,获取组内经纬度的平均值
       .groupBy($"geoHash")
       //4. 获取组内经纬度的平均值,高德地图解析经纬度,要求6为小数
       .agg(

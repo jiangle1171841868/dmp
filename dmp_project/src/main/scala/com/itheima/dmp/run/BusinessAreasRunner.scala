@@ -7,11 +7,11 @@ import org.apache.spark.sql.{DataFrame, SparkSession}
 
 /**
   * 根据经纬度,调用高德API,获取商圈信息,保存到kudu表中 -> 将每一天的数据追加到kudu表
-  * 1. 构建sparksession实例对象
-  * 2. 读取kudu表的数据
-  * 3. 抽取方法 -> 根据经纬度获取商圈数据
-  * 4. 保存到kudu表
-  * 4. 关闭资源
+  *    - 1. 构建sparksession实例对象
+  *    - 2. 读取kudu表的数据
+  *    - 3. 抽取方法 -> 根据经纬度获取商圈数据
+  *    - 4. 保存到kudu表
+  *    - 5. 关闭资源
   */
 object BusinessAreasRunner {
 

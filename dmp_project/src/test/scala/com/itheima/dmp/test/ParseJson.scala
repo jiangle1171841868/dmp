@@ -8,9 +8,9 @@ import org.json4s.jackson.JsonMethods._
 
 /**
   * 解析高德地图返回的JSON,返回格式为 商圈1:商圈2:商圈3
-  * 1.使用json4s解析json数据
-  * 2.获取商圈信息
-  * 3.将商圈信息拼接为需要的格式
+  *    - 1.使用json4s解析json数据
+  *    - 2.获取商圈信息
+  *    - 3.将商圈信息拼接为需要的格式
   */
 
 object ParseJson {

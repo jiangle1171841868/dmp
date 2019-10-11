@@ -28,14 +28,14 @@ object SparkConfigTest {
         *          - 解决:获取属性的来源 过滤出spark.conf的数据
         */
 
-      //a.获取数据来源
+      // a. 获取数据来源
       val configResource: String = entry.getValue.origin().resource()
       //println(configResource)
 
       /// TODO:  注意: 系统属性是的来源是null 如果使用configResource调用equals()方法 就会空指针异常  所以使用字符串类调用方法 也可以configResource == "spark.conf"
       if ("spark.conf".equals(configResource)) {
 
-        //b.调用unwrapped() 拆箱去掉Config的封装
+        // b.调用unwrapped() 拆箱去掉Config的封装
         println(s"${entry.getKey}  -> ${entry.getValue.unwrapped()}")
       }
     }

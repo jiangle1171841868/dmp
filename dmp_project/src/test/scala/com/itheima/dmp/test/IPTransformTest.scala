@@ -7,6 +7,7 @@ import org.lionsoul.ip2region.{DbConfig, DbSearcher}
 /// TODO: 使用ip2region将ip转化为省份  使用GeoLite将ip转化为经纬度信息
 object IPTransformTest {
 
+  // 测试方法
   def main(args: Array[String]): Unit = {
 
     val ip: String = "36.62.163.115"

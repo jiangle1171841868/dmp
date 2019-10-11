@@ -26,6 +26,7 @@ object PmtETLRunner {
     //a.创建表 表的名称 -> ods_adinfo_20190914  -> 每天一个表
     val tableName: String = AppConfigHelper.AD_MAIN_TABLE_NAME
     val schema: StructType = kuduDF.schema
+    // 主键必须是schema中的字段
     val keys: Seq[String] = Seq("uuid")
     spark.createKuduTable(tableName, schema, keys)
 

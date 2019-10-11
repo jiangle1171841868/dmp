@@ -6,7 +6,6 @@ import com.itheima.dmp.utils.TagUtils
 import org.apache.spark.graphx.{Edge, Graph, VertexId, VertexRDD}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{DataFrame, Dataset}
-import org.apache.spark.storage.StorageLevel
 
 import scala.collection.mutable.ListBuffer
 
@@ -21,7 +20,7 @@ object MergeTagsProcessor extends Processor {
     val spark = allTagsDF.sparkSession
     import spark.implicits._
 
-    // 2. 将DataFrame转化为DataSet -> DataFrame + 外部数据表类型 转化为DataSet  -> 再转化为RDD -> RDD内部数据结构就不是Rowm,是样例类便于操作数据
+    // 2. 将DataFrame转化为DataSet -> DataFrame + 外部数据表类型 转化为DataSet  -> 再转化为RDD -> RDD内部数据结构就不是Row,是样例类便于操作数据
     val rallTagsRDDdd: RDD[IdsWithTags] = allTagsDF.as[IdsWithTags].rdd
 
     /// TODO: 针对allTagsRDD数据集构建图，获取连通图，进行统一用户识别和数据标签的合并
@@ -61,19 +60,18 @@ object MergeTagsProcessor extends Processor {
       }
       // 将list转化Wie不可变集合返回
       list.toList
-    }.distinct()
+    }.distinct() // ids有重复值 需要去重
     //verticesRDD.persist(StorageLevel.MEMORY_AND_DISK) // 缓存RDD
     //println(s"构建数据标签的顶点数目: ${verticesRDD.count()}") // 触发缓存
-
 
     /**
       * 4. 创建边RDD
       *
       *    -  边的数据封装到Edge中   ->  srcId, dstId, edgeAttr
       *    -  Edge[String] 里面的泛型就是边属性的类型   可以是这些类型 ->  (Char, Int, Boolean, Byte, Long, Float, Double)
-      *       - srcId  源Id        ->  主标识Id  mainId
-      *       - dstId 目标Id       ->   ids标识
-      *       - edgeAttr 边得属性  ->  自定义 可有可无
+      *          - srcId  源Id        ->  主标识Id  mainId
+      *          - dstId 目标Id       ->   ids标识
+      *          - edgeAttr 边得属性  ->  自定义 可有可无
       */
 
     val edgesRDD: RDD[Edge[String]] = rallTagsRDDdd.flatMap { case IdsWithTags(mainId: String, idsMap: Map[String, String], tagsMap: Map[String, Double]) =>
@@ -110,7 +108,7 @@ object MergeTagsProcessor extends Processor {
       * 获取的连通图中只有顶点Id,需要join原图数据集获取顶点的属性
       */
 
-    // a.获取原图中顶点数据集
+    // a. 获取原图中顶点数据集
     val verticesGraphRDD: VertexRDD[String] = graph.vertices
 
     // b. 将连通图中的顶点数据集与原图中顶点数据集join  -> join 使用与k v类型的RDD
@@ -139,9 +137,9 @@ object MergeTagsProcessor extends Processor {
 
         /**
           * 标签合并
-          *   - 1. 以tmpTagsMap为基准
-          *   - 2. 遍历tmpTagsMap的key,tagsMap中含有key就将权重相加合并,没有key就直接返回
-          *   - 3. 最后tagsMap中有,tmpTagsMap中没有的key,需要添加进去,使用Map集合 ++ 后面的会覆盖前面已经有的,没有就添加 -> 将tagsMap的剩余数据合并在一起
+          *     - 1. 以tmpTagsMap为基准
+          *     - 2. 遍历tmpTagsMap的key,tagsMap中含有key就将权重相加合并,没有key就直接返回
+          *     - 3. 最后tagsMap中有,tmpTagsMap中没有的key,需要添加进去,使用Map集合 ++ 后面的会覆盖前面已经有的,没有就添加 -> 将tagsMap的剩余数据合并在一起
           */
 
         // 获取tmpTagsMap的key
@@ -182,8 +180,6 @@ object MergeTagsProcessor extends Processor {
         .filter { case (vertexId, vertexAttr) => vertexAttr.startsWith("mainid##") }
         //随便获取一个就可以作为mainId
         .head._2.split("##")(2)
-
-
 
       //返回样例类
       UserTags(main_id, TagUtils.map2Str(idsMap), tagsStr)

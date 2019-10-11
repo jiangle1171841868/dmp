@@ -23,10 +23,9 @@ object SparkHBaseRead {
       .setMaster("local[4]")
       // 设置使用Kryo序列
       .set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-      // 注册哪些类型使用Kryo序列化, 最好注册RDD中类型
+      // 注册哪些类型使用Kryo序列化, 注册RDD中类型
       .registerKryoClasses(Array(classOf[ImmutableBytesWritable], classOf[Result]))
     val sc: SparkContext = new SparkContext(sparkConf)
-
 
     // b. 从HBase表中读取数据  -> 一个region对应一个分区
 
@@ -42,7 +41,6 @@ object SparkHBaseRead {
     val conf: Configuration = HBaseConfiguration.create()
     // 设置读HBase表的名称 配置属性在里面找   mapreduce.TableInputFormat  新的MR  API
     conf.set(TableInputFormat.INPUT_TABLE, "userState")
-
 
     val hbaseRDD: RDD[(ImmutableBytesWritable, Result)] = sc.newAPIHadoopRDD(
       conf,

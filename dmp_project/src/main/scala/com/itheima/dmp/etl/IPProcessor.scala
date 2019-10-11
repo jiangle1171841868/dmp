@@ -97,7 +97,7 @@ object IPProcessor extends Processor {
       'age, 'sex, 'geoHash
     )
 
-    //val kuduDF = newDF.select(selectColumns: _*) // _* 可变参数 -> 将集合转换为一个个元素
+    //val kuduDF = newDF.select(selectColumns: _*) //    _*    ->  将集合转换为一个个元素
 
     //b.方式二:drop:参数 字段名   -> 直接根据字段名删除重复的字段
     val kuduDF: DataFrame = newDF.drop("provincename", "cityname", "lang", "lat")

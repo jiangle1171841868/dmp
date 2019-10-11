@@ -31,10 +31,10 @@ object MakeTagsProcessor extends Processor {
     /**
       *
       * 遍历用户的ods信息,经过表连接此时已经有了商圈信息
-      * a. 提取各个标签属性值，求得标签集合
-      * b. 获取id集合
-      * c. 获取主ID
-      * d. 返回样例类
+      *    - a. 提取各个标签属性值，求得标签集合
+      *    - b. 获取id集合
+      *    - c. 获取主ID
+      *    - d. 返回样例类
       **/
 
     //加载字典数据,使用SparkContext中广播变量将字段广播到Exexutor内存中

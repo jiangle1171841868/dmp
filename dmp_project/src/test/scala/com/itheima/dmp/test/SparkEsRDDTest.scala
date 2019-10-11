@@ -62,7 +62,6 @@ object SparkEsRDDTest {
     val esJsonRDD: RDD[(String, String)] = sc.esJsonRDD("spark-json/airports")
     esJsonRDD.foreach(println)
 
-
     sc.stop()
   }
 

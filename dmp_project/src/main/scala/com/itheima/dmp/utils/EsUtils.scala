@@ -3,8 +3,7 @@ package com.itheima.dmp.utils
 
 import com.itheima.dmp.beans.UserTags
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
-import org.json4s._
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.json4s.JsonDSL._
 import org.json4s.jackson.JsonMethods._
 
@@ -49,9 +48,11 @@ object EsUtils {
           }
 
             // c. 按照标签的前缀分组,保存到es中是以前缀为字段名保存数据  ->  保存数据格式   标签前缀   ->  标签名:标签权重集合中所有数据拼接的字符串
-            .groupBy(_._1)
+            .groupBy(_._1) // 相同key的K V 放在集合里面
             //将每个组内的value组合,拼接成一个字符串
             .map { case (kewWord, list) =>
+
+            //val xx: List[(String, String)] = list
 
             kewWord -> list.map(_._2).mkString(",")
           }

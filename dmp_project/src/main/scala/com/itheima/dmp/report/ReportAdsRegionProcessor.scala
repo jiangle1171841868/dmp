@@ -25,8 +25,6 @@ object ReportAdsRegionProcessor extends ReportProcessor {
     val spark = odsDF.sparkSession
 
     /// TODO: 使用SQl进行报表分析
-    //需要多次使用odsDF,将odsDF缓存
-    odsDF.persist(StorageLevel.MEMORY_AND_DISK)
 
     //将odsDF注册为临时视图,使用sql分析
     odsDF.createOrReplaceTempView("view_region")

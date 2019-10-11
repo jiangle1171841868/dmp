@@ -45,7 +45,7 @@ object DailyTagsRunner {
     val optionOdsDF: Option[DataFrame] = spark.readKuduTable(ODS_TABLE_NAME)
     val odsDF: DataFrame = optionOdsDF match {
       case Some(odsDF) => odsDF
-      case None => println("ERROR: ODS表无数据,结束执行"); return
+      case None => println("ERROR: ODS表无数据,结束执行"); return    //ods表没有数据,直接结束执行
     }
 
     // 2.2  加载area表的数据
@@ -72,7 +72,7 @@ object DailyTagsRunner {
     //标签合并
     val allTagsDF: DataFrame = historyTagsDFOption match {
       case Some(historyTagsDFOption) =>
-        tagsDF.union(HistoryTagsProcessor.processData(historyTagsDFOption)) //union 就相当于sql中的union all
+        tagsDF.union(HistoryTagsProcessor.processData(historyTagsDFOption))    //union 就相当于sql中的union all
       case None => tagsDF
     }
 

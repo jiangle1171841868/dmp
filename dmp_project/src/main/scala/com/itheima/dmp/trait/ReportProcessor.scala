@@ -22,14 +22,14 @@ trait ReportProcessor extends Logging {
 
     val spark: SparkSession = odsDF.sparkSession
 
-    //1.调用实际报表处理的方法   ->  处理数据
+    // 1. 调用实际报表处理的方法   ->  处理数据
     val reportDF: DataFrame = realProcessData(odsDF)
 
-    //2.将数据保存到kudu表中
+    // 2. 将数据保存到kudu表中
     import com.itheima.dmp.utils.KuduUtils._
-    //a.创建表，如果表存在不删除不创建 -> 表名和keys是变化的 -> 抽取出来作为抽象字段
+    // a. 创建表，如果表存在不删除不创建 -> 表名和keys是变化的 -> 抽取出来作为抽象字段
     spark.createKuduTable(tableName, reportDF.schema, keys, isDelete = false)
-    //b.保存数据 -> 报表处理后的数据比较少  考虑降低分区数
+    // b. 保存数据 -> 报表处理后的数据比较少  考虑降低分区数
     reportDF.coalesce(1).saveAsKuduTable(tableName)
 
   }

@@ -56,7 +56,8 @@ class KuduUtils extends Logging {
         logInfo(s"表 $tableName 在kudu中已经存在,已经删除....")
       } else {
         logInfo(s"表 $tableName 在kudu中已经存在,不允许删除....")
-        return
+        // 表已经存在,不允许删除,直接结束程序返回就可以
+        return  // 使用return的时候需要有返回值  Unit也可以,但是必须有  -> 表示结束程序
       }
     }
 
