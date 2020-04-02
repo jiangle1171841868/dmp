@@ -76,7 +76,6 @@ object DailyTagsRunner {
       case None => tagsDF
     }
 
-
     // 5. 用户统一统一识别  ->  合并标签
     val userTagsDF: DataFrame = MergeTagsProcessor.processData(allTagsDF)
     //userTagsDF.printSchema()
