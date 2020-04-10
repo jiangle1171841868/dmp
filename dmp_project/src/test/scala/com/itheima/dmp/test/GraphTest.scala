@@ -3,7 +3,6 @@ package com.itheima.dmp.test
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.graphx.{Edge, Graph, VertexId, VertexRDD}
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.SparkSession
 import org.apache.spark.storage.StorageLevel
 
 import scala.collection.mutable.ListBuffer
